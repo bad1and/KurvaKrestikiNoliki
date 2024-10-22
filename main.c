@@ -10,6 +10,7 @@ int position = 0;
 int n_button;
 bool test = false;
 bool done = false;
+int counter_X_O;
 
 // хранение коорд
 typedef struct {
@@ -75,7 +76,14 @@ void drawmain(int width, int height, char maze[height][width], int PosX, int Pos
     if (done == true) {
         printw("Для выхода нажмите ESC");
     }
-
+    if (key == 'x' && counter_X_O %2 != 0) { //начало
+        printw("Сейчас ход нолика!\n");
+        // printw("Всего ходов: %i",counter_X_O);
+    }
+    if (key == 'o' && counter_X_O % 2 == 0) { //конец
+        printw("Сейчас ход икса!\n");
+        // printw("Всего ходов: %i",counter_X_O);
+    }
 }
 
 // Заполняем начальный массив точками
@@ -87,7 +95,7 @@ void createlab(int width, int height, char maze[height][width]) {
     }
 }
 
-void keywork(char maze[height][width], Point* start, Point* end, bool* pathFound) {
+void keywork(char maze[height][width], Point* start, Point* end) {
     drawmain(width, height, maze, PosX, PosY);
 
     key = getch();
@@ -109,26 +117,31 @@ void keywork(char maze[height][width], Point* start, Point* end, bool* pathFound
             start->x = -1;
             start->y = -1;
             maze[PosY][PosX] = '.';
+            counter_X_O--;
         }
         if (maze[PosY][PosX] == 'O') {
             end->x = PosX;
             end->y = PosY;
             maze[PosY][PosX] = '.';
+            counter_X_O--;
         }
         maze[PosY][PosX] = '.';
     }
 
-    if (key == 'x') { //начало
+    if (key == 'x' && counter_X_O%2==0) { //начало
         start->x = PosX;
         start->y = PosY;
         maze[PosY][PosX] = 'X';
+        counter_X_O++;
     }
-    if (key == 'o') { //конец
+
+    if (key == 'o' && counter_X_O%2!=0) { //конец
         end->x = PosX;
         end->y = PosY;
         maze[PosY][PosX] = 'O';
+        counter_X_O++;
     }
-    // if (key == 'p') { //показываем путь
+    // if (key == 'p') { //решаем
     // }
 }
 
@@ -137,7 +150,6 @@ int main() {
     initscr();
     keypad(stdscr, FALSE);
     Point start = {-1, -1}, end = {-1, -1}; // за границу заносим
-    bool pathFound = false;
     while (true) {
         menu();
 
@@ -167,7 +179,7 @@ int main() {
 
         //1 laba
         if ((position == 0 && n_button == 10) || n_button == 27) {
-            int test1 = 0,test2 = 0;
+            counter_X_O = 0;
             done = false;
             keypad(stdscr, TRUE);
             clear();
@@ -191,7 +203,7 @@ int main() {
 
             while (1) {
                 // Отображаем лаб
-                keywork(maze, &start, &end, &pathFound);
+                keywork(maze, &start, &end);
 
                 if (key == 27) {
                     keypad(stdscr, FALSE);

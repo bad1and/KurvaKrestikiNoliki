@@ -4,11 +4,10 @@
 #include <ncurses.h>
 
 int key;
-int width, height;
+int width, height,znaki_riad;
 int PosX = 1, PosY = 1;
 int position = 0;
 int n_button;
-bool test = false;
 bool done = false;
 int counter_X_O;
 
@@ -55,6 +54,7 @@ void menu() {
     }
 }
 
+//экран и ошибки
 void drawmain(int width, int height, char maze[height][width], int PosX, int PosY) {
     clear(); // Очищаем экран
     for (int y = 0; y < height; y++) {
@@ -67,21 +67,15 @@ void drawmain(int width, int height, char maze[height][width], int PosX, int Pos
         }
     }
     printw("\n");
-    if (test == true) {
-        printw("Отсутствует старт/конец или нет решений");
-    }
-    else {
-        printw("\n");
-    }
     if (done == true) {
         printw("Для выхода нажмите ESC");
     }
     if (key == 'x' && counter_X_O %2 != 0) { //начало
-        printw("Сейчас ход нолика!\n");
+        printw("Следующий ход нолика (O).\n");
         // printw("Всего ходов: %i",counter_X_O);
     }
     if (key == 'o' && counter_X_O % 2 == 0) { //конец
-        printw("Сейчас ход икса!\n");
+        printw("Следующий ход крестика (X).\n");
         // printw("Всего ходов: %i",counter_X_O);
     }
 }
@@ -95,6 +89,7 @@ void createlab(int width, int height, char maze[height][width]) {
     }
 }
 
+//отрисовка + обрвботка кнопок
 void keywork(char maze[height][width], Point* start, Point* end) {
     drawmain(width, height, maze, PosX, PosY);
 
@@ -145,6 +140,7 @@ void keywork(char maze[height][width], Point* start, Point* end) {
     // }
 }
 
+
 int main() {
     setlocale(LC_ALL, "");
     initscr();
@@ -183,18 +179,30 @@ int main() {
             done = false;
             keypad(stdscr, TRUE);
             clear();
-            printw("Введите размеры - ширину и высоту через пробел (если значения маленькие будет выведен кв 2x2): ");
-            scanw("%d %d", &width, &height);
+            while (true) {
+                printw("Введите размеры игрового поля (от 3 до 15): ");
+                scanw("%d %d", &width, &height);
+                if (width < 3 || height < 3 || (width < 3 && height < 3) || (width > 15 && height > 15) || width > 15 || height > 15) {
+                    clear();
+                    printw("Неверные значения!\n");
+                }else {
+                    break;
+                }
+            }
             clear();
 
-            if (width <=1){
-                width = 2;
-                height = 2;
+            while (true) {
+                printw("Введите количество знаков в ряду для победы (от 3 до 15): ");
+                scanw("%d", &znaki_riad);
+                if (znaki_riad < 3 || znaki_riad > 15) {
+                    clear();
+                    printw("Неверные значения!\n");
+                }else {
+                    break;
+                }
             }
-            if (height <=1){
-                width = 2;
-                height = 2;
-            }
+            clear();
+
             // Создаем лабиринт
             char maze[width][height];
 

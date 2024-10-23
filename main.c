@@ -4,12 +4,14 @@
 #include <ncurses.h>
 
 int key;
-int width, height,znaki_riad;
+int width, height, znaki_riad;
 int PosX = 1, PosY = 1;
 int position = 0;
 int n_button;
 bool done = false;
 int counter_X_O;
+int win_counter;
+
 
 // хранение коорд
 typedef struct {
@@ -23,10 +25,9 @@ void instruction (){
     printw("%s", "-------------------------------------------------------\n");
     printw("%s", "Используйте стрелки для перемещения\n");
     printw("%s", "Вы - $\n");
-    printw("%s", " - установка стены, DELETE - удалить значение в клетке\n");
-    printw("%s", "S - установка старта, E - установка конца\n");
-    printw("%s", "P - расчет пути\n\n");
-
+    printw("%s", "Игра начинается с крестика (Х)\n");
+    printw("%s", "X - установка крестика, O - установка нолика\n");
+    printw("%s", "DELETE - удалить значение в клетке\n");
 }
 
 void menu() {
@@ -51,10 +52,68 @@ void menu() {
             printw("%s\n", screen[i]);
         }
 
+        if (i == 3 && win_counter == 10) {
+            printw("X WINline!\n");
+        }
+        if (i == 3 && win_counter == 11) {
+            printw("O WINline!\n");
+        }
+        if (i == 3 && win_counter == 12) {
+            printw("Nichya!!!\n");
+        }
     }
 }
 
-//экран и ошибки
+// Проверка победы
+bool check_win(int x, int y, char maze[height][width], char symbol) {
+    int directions[4][2] = {{1, 0}, {0, 1}, {1, 1}, {1, -1}}; // Вправо, вниз, диагонали
+    for (int d = 0; d < 4; d++) {
+        int dx = directions[d][0];
+        int dy = directions[d][1];
+        int count = 1;
+
+        //в одну сторону
+        for (int step = 1; step < znaki_riad; step++) {
+            int nx = x + step * dx;
+            int ny = y + step * dy;
+            if (nx >= 0 && ny >= 0 && nx < width && ny < height && maze[ny][nx] == symbol) {
+                count++;
+            } else {
+                break;
+            }
+        }
+
+        //в обратную сторону
+        for (int step = 1; step < znaki_riad; step++) {
+            int nx = x - step * dx;
+            int ny = y - step * dy;
+            if (nx >= 0 && ny >= 0 && nx < width && ny < height && maze[ny][nx] == symbol) {
+                count++;
+            } else {
+                break;
+            }
+        }
+
+        if (count >= znaki_riad) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// Проверка ничьи
+bool check_draw(char maze[height][width]) {
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            if (maze[y][x] == '.') {
+                return false; // Есть пустые клетки
+            }
+        }
+    }
+    return true; // Все клетки заняты
+}
+
+// экран и ошибки
 void drawmain(int width, int height, char maze[height][width], int PosX, int PosY) {
     clear(); // Очищаем экран
     for (int y = 0; y < height; y++) {
@@ -67,16 +126,15 @@ void drawmain(int width, int height, char maze[height][width], int PosX, int Pos
         }
     }
     printw("\n");
+
     if (done == true) {
-        printw("Для выхода нажмите ESC");
+        printw("Для выхода нажмите ESC\n");
     }
-    if (key == 'x' && counter_X_O %2 != 0) { //начало
+
+    if (key == 'x' && counter_X_O % 2 != 0) {
         printw("Следующий ход нолика (O).\n");
-        // printw("Всего ходов: %i",counter_X_O);
-    }
-    if (key == 'o' && counter_X_O % 2 == 0) { //конец
+    } else if (key == 'o' && counter_X_O % 2 == 0) {
         printw("Следующий ход крестика (X).\n");
-        // printw("Всего ходов: %i",counter_X_O);
     }
 }
 
@@ -89,7 +147,7 @@ void createlab(int width, int height, char maze[height][width]) {
     }
 }
 
-//отрисовка + обрвботка кнопок
+// отрисовка + обработка кнопок
 void keywork(char maze[height][width], Point* start, Point* end) {
     drawmain(width, height, maze, PosX, PosY);
 
@@ -107,64 +165,64 @@ void keywork(char maze[height][width], Point* start, Point* end) {
     if (key == KEY_LEFT) {
         if (PosX > 0) PosX--;
     }
+
     if (key == 127) {
-        if (maze[PosY][PosX] == 'X') {
-            start->x = -1;
-            start->y = -1;
-            maze[PosY][PosX] = '.';
-            counter_X_O--;
-        }
-        if (maze[PosY][PosX] == 'O') {
-            end->x = PosX;
-            end->y = PosY;
-            maze[PosY][PosX] = '.';
-            counter_X_O--;
-        }
         maze[PosY][PosX] = '.';
+        counter_X_O--;
     }
 
-    if (key == 'x' && counter_X_O%2==0) { //начало
-        start->x = PosX;
-        start->y = PosY;
+    if (key == 'x' && counter_X_O % 2 == 0) {
         maze[PosY][PosX] = 'X';
         counter_X_O++;
+
+        if (check_win(PosX, PosY, maze, 'X')) {
+            drawmain(width, height, maze, PosX, PosY);
+            win_counter = 10; // X win
+            done = true;
+        } else if (check_draw(maze)) {
+            drawmain(width, height, maze, PosX, PosY);
+            win_counter = 12; // nichya
+            done = true;
+        }
     }
 
-    if (key == 'o' && counter_X_O%2!=0) { //конец
-        end->x = PosX;
-        end->y = PosY;
+    if (key == 'o' && counter_X_O % 2 != 0) {
         maze[PosY][PosX] = 'O';
         counter_X_O++;
-    }
-    // if (key == 'p') { //решаем
-    // }
-}
 
+        if (check_win(PosX, PosY, maze, 'O')) {
+            drawmain(width, height, maze, PosX, PosY);
+            win_counter = 11; //O win
+            done = true;
+        } else if (check_draw(maze)) {
+            drawmain(width, height, maze, PosX, PosY);
+            win_counter = 12; // nichya
+            done = true;
+        }
+    }
+}
 
 int main() {
     setlocale(LC_ALL, "");
     initscr();
     keypad(stdscr, FALSE);
     Point start = {-1, -1}, end = {-1, -1}; // за границу заносим
+
     while (true) {
         menu();
-
         n_button = getch();
 
+        //buttonЫ
         if (n_button == 27) {
-            // ESC
             n_button = getch();
             if (n_button == 91) {
-                // enter
                 n_button = getch();
                 if (n_button == 65) {
-                    // up
                     position = position - 1;
                     if (position < 0) {
                         position = 2;
                     }
                 } else if (n_button == 66) {
-                    // down
                     position = position + 1;
                     if (position > 2) {
                         position = 0;
@@ -173,8 +231,9 @@ int main() {
             }
         }
 
-        //1 laba
+       //MAIN_Ы
         if ((position == 0 && n_button == 10) || n_button == 27) {
+            win_counter = 0;
             counter_X_O = 0;
             done = false;
             keypad(stdscr, TRUE);
@@ -182,10 +241,10 @@ int main() {
             while (true) {
                 printw("Введите размеры игрового поля (от 3 до 15): ");
                 scanw("%d %d", &width, &height);
-                if (width < 3 || height < 3 || (width < 3 && height < 3) || (width > 15 && height > 15) || width > 15 || height > 15) {
+                if (width < 3 || height < 3 || width > 15 || height > 15) {
                     clear();
                     printw("Неверные значения!\n");
-                }else {
+                } else {
                     break;
                 }
             }
@@ -197,30 +256,26 @@ int main() {
                 if (znaki_riad < 3 || znaki_riad > 15) {
                     clear();
                     printw("Неверные значения!\n");
-                }else {
+                } else {
                     break;
                 }
             }
             clear();
 
-            // Создаем лабиринт
             char maze[width][height];
-
-            PosX = 1, PosY = 1;
             createlab(width, height, maze);
 
             while (1) {
-                // Отображаем лаб
                 keywork(maze, &start, &end);
 
-                if (key == 27) {
+                if (done || key == 27) {
                     keypad(stdscr, FALSE);
                     break;
                 }
             }
         }
 
-        // 2 пункт
+        //Instruction
         if ((position == 1 && n_button == 10)) {
             clear();
             instruction();
@@ -231,7 +286,6 @@ int main() {
             }
         }
 
-        //exit
         if ((position == 2 && n_button == 10) || n_button == 27) {
             break;
         }

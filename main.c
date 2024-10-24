@@ -53,13 +53,13 @@ void menu() {
         }
 
         if (i == 3 && win_counter == 10) {
-            printw("X WINline!\n");
+            printw("X WIN!\n");
         }
         if (i == 3 && win_counter == 11) {
-            printw("O WINline!\n");
+            printw("O WIN!\n");
         }
         if (i == 3 && win_counter == 12) {
-            printw("Nichya!!!\n");
+            printw("Ничья!\n");
         }
     }
 }

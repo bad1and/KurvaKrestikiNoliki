@@ -1,12 +1,7 @@
 # ninja log v6
-1	257	1729601855199177103	build.ninja	40068c7b03f6bae2
-151	235	1729601784688862084	KurvaKrestikiNoliki	8b9b295d02f3b426
-2	151	1729601784540357630	CMakeFiles/KurvaKrestikiNoliki.dir/main.c.o	fd8fbae2cff04062
-5	233	1729602923915927061	CMakeFiles/KurvaKrestikiNoliki.dir/main.c.o	fd8fbae2cff04062
-233	358	1729602924143910908	KurvaKrestikiNoliki	8b9b295d02f3b426
-2	180	1729603092430328827	CMakeFiles/KurvaKrestikiNoliki.dir/main.c.o	fd8fbae2cff04062
-180	269	1729603092608238545	KurvaKrestikiNoliki	8b9b295d02f3b426
-2	172	1729603305848717048	CMakeFiles/KurvaKrestikiNoliki.dir/main.c.o	fd8fbae2cff04062
-172	260	1729603306018943125	KurvaKrestikiNoliki	8b9b295d02f3b426
-4	174	1729603477760443378	CMakeFiles/KurvaKrestikiNoliki.dir/main.c.o	fd8fbae2cff04062
-174	264	1729603477930427287	KurvaKrestikiNoliki	8b9b295d02f3b426
+2	180	1730160125345618780	CMakeFiles/KurvaKrestikiNoliki.dir/test.c.o	2f42c9bdf36438a7
+2	236	1730230118403908122	CMakeFiles/KurvaKrestikiNoliki.dir/main.c.o	fd8fbae2cff04062
+236	356	1730230118637738973	KurvaKrestikiNoliki	8b9b295d02f3b426
+3	68	1730303277647268749	build.ninja	40068c7b03f6bae2
+8	247	1730370296531796440	CMakeFiles/KurvaKrestikiNoliki.dir/main.c.o	fd8fbae2cff04062
+247	402	1730370296770865454	KurvaKrestikiNoliki	8b9b295d02f3b426

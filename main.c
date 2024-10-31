@@ -64,6 +64,50 @@ void menu() {
     }
 }
 
+
+
+bool canWin(int coutForWin, int sizeX, int sizeY, char maze[sizeY][sizeX], char symbol) {
+    // Проверка строк
+    for (int y = 0; y < sizeY; y++) {
+        for (int x = 0; x <= sizeX - coutForWin; x++) {
+            int cnt = 0;
+            for (int k = 0; k < coutForWin; k++) {
+                if (maze[y][x + k] == symbol || maze[y][x + k] == '.') {
+                    cnt++;
+                }
+            }
+            if (cnt == coutForWin) return true;
+        }
+    }
+
+    // Проверка столбцов
+    for (int x = 0; x < sizeX; x++) {
+        for (int y = 0; y <= sizeY - coutForWin; y++) {
+            int cnt = 0;
+            for (int k = 0; k < coutForWin; k++) {
+                if (maze[y + k][x] == symbol || maze[y + k][x] == '.') {
+                    cnt++;
+                }
+            }
+            if (cnt == coutForWin) return true;
+        }
+    }
+
+    // Проверка диагоналей
+    for (int y = 0; y <= sizeY - coutForWin; y++) {
+        for (int x = 0; x <= sizeX - coutForWin; x++) {
+            int cnt1 = 0, cnt2 = 0;
+            for (int k = 0; k < coutForWin; k++) {
+                if (maze[y + k][x + k] == symbol || maze[y + k][x + k] == '.') cnt1++;
+                if (maze[y + k][x + coutForWin - 1 - k] == symbol || maze[y + k][x + coutForWin - 1 - k] == '.') cnt2++;
+            }
+            if (cnt1 == coutForWin || cnt2 == coutForWin) return true;
+        }
+    }
+
+    return false;
+}
+
 // Проверка победы
 bool check_win(int x, int y, char maze[height][width], char symbol) {
     int directions[4][2] = {{1, 0}, {0, 1}, {1, 1}, {1, -1}}; // Вправо, вниз, диагонали
@@ -179,7 +223,7 @@ void keywork(char maze[height][width], Point* start, Point* end) {
             drawmain(width, height, maze, PosX, PosY);
             win_counter = 10; // X win
             done = true;
-        } else if (check_draw(maze)) {
+        } else if ((!canWin(znaki_riad, width, height, maze, 'X') && !canWin(znaki_riad, width, height, maze, 'O')) || check_draw(maze)) {
             drawmain(width, height, maze, PosX, PosY);
             win_counter = 12; // nichya
             done = true;
@@ -192,15 +236,17 @@ void keywork(char maze[height][width], Point* start, Point* end) {
 
         if (check_win(PosX, PosY, maze, 'O')) {
             drawmain(width, height, maze, PosX, PosY);
-            win_counter = 11; //O win
+            win_counter = 11; // O win
             done = true;
-        } else if (check_draw(maze)) {
+        } else if ((!canWin(znaki_riad, width, height, maze, 'X') && !canWin(znaki_riad, width, height, maze, 'O')) || check_draw(maze)) {
             drawmain(width, height, maze, PosX, PosY);
             win_counter = 12; // nichya
             done = true;
         }
     }
+
 }
+
 
 int main() {
     setlocale(LC_ALL, "");
@@ -239,7 +285,7 @@ int main() {
             keypad(stdscr, TRUE);
             clear();
             while (true) {
-                printw("Введите размеры игрового поля (от 3 до 15): ");
+                printw("Введите размеры игрового поля через пробел (от 3 до 15): ");
                 scanw("%d %d", &width, &height);
                 if (width < 3 || height < 3 || width > 15 || height > 15) {
                     clear();

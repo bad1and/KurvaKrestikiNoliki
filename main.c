@@ -32,7 +32,7 @@ void instruction (){
 
 void menu() {
     printw("%s", "KrestikiNoliki by Tikhanov Oleg\n");
-    printw("%s", "ver 0.1\n");
+    printw("%s", "ver 1.0\n");
     printw("%s", "\n");
     printw("%s", "Перед использованием прочитайте инструкцию 2 п.\n");
     printw("%s", "-----------------\n");
@@ -210,12 +210,7 @@ void keywork(char maze[height][width], Point* start, Point* end) {
         if (PosX > 0) PosX--;
     }
 
-    if (key == 127) {
-        maze[PosY][PosX] = '.';
-        counter_X_O--;
-    }
-
-    if (key == 'x' && counter_X_O % 2 == 0) {
+    if (key == 'x' && counter_X_O % 2 == 0 && maze[PosY][PosX] == '.') {
         maze[PosY][PosX] = 'X';
         counter_X_O++;
 
@@ -230,7 +225,7 @@ void keywork(char maze[height][width], Point* start, Point* end) {
         }
     }
 
-    if (key == 'o' && counter_X_O % 2 != 0) {
+    if (key == 'o' && counter_X_O % 2 != 0 && maze[PosY][PosX] == '.') {
         maze[PosY][PosX] = 'O';
         counter_X_O++;
 
